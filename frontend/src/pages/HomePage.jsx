@@ -3,6 +3,13 @@ import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
 import Navbar from '../components/Navbar';
 import { getCountryByName } from '../services/countryService';
 import { Modal, Button } from 'react-bootstrap';
+import QuizModal from '../components/QuizModal';
+import { useEffect } from 'react';
+import axios from 'axios';
+import FilterPanel from '../components/FilterPanel';
+import { Container } from 'react-bootstrap';
+import Sidebar from '../components/Sidebar'; // import at the top
+
 
 const geoUrl = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
 
@@ -16,6 +23,10 @@ const getColor = (name) => {
 const HomePage = () => {
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [showQuiz, setShowQuiz] = useState(false);
+  const [quizCountryName, setQuizCountryName] = useState('');
+  const [filters, setFilters] = useState({ region: '', language: '' });
+  const [allCountries, setAllCountries] = useState([]);
 
   const handleCountryClick = async (geo) => {
     const name = geo.properties.NAME || geo.properties.name;
@@ -29,6 +40,7 @@ const HomePage = () => {
         region: data.region,
         population: data.population,
         flag: data.flags?.svg,
+        languages: data.languages,
       });
       setShowModal(true);
     }
@@ -36,9 +48,33 @@ const HomePage = () => {
 
   const handleClose = () => setShowModal(false);
 
+  const handleFilter = (newFilters) => {
+    setFilters(newFilters);
+  };
+
+  const shouldHighlight = (country) => {
+    const regionMatch = !filters.region || country.region === filters.region;
+    return regionMatch;
+  };
+
+  useEffect(() => {
+    axios.get('https://restcountries.com/v3.1/all')
+      .then(res => setAllCountries(res.data))
+      .catch(err => console.error(err));
+  }, []);
+
   return (
     <div className="min-vh-100" style={{ background: 'linear-gradient(to right, #f8f9fa, #e9ecef)' }}>
       <Navbar />
+      <Sidebar
+        region={filters.region}
+        setRegion={(r) => setFilters(prev => ({ ...prev, region: r }))}
+        language={filters.language}
+        setLanguage={(l) => setFilters(prev => ({ ...prev, language: l }))}
+        onApply={() => {/* apply logic */}}
+        onClear={() => setFilters({ region: '', language: '' })}
+        />
+      
 
       <div className="d-flex justify-content-center align-items-start px-3" style={{ marginTop: '70px' }}>
       
@@ -47,60 +83,60 @@ const HomePage = () => {
           style={{
             width: '95%',
             maxWidth: '1200px',
-            height: '640px',
-            padding: '20px',
+            height: '720px',
+            padding: '10px',
             overflow: 'hidden',
           }}
         >
-        <div className="mb-4 text-center">
-            <h3
-                className="fw-bold"
-                style={{
-                fontSize: '1.75rem',
-                color: '#343a40',
-                }}
-            >
-                <span role="img" aria-label="globe">🌍</span> Select a Country to Explore
-            </h3>
-        </div>
-          <ComposableMap
+        <Container className="mt-4">
+                <FilterPanel onApply={setFilters} />
+            </Container>
+            <ComposableMap
             projectionConfig={{ scale: 160 }}
-            width={980}
-            height={551}
-            style={{
-              backgroundColor: '#ffffff',
-              borderRadius: '12px',
-              width: '100%',
-              height: '100%',
-            }}
-          >
+            style={{ width: '100%', height: '100%' }}
+            >
             <Geographies geography={geoUrl}>
-              {({ geographies }) =>
-                geographies.map((geo) => (
-                  <Geography
+            {({ geographies }) =>
+                geographies.map((geo) => {
+                // ✅ geo is accessible here
+
+                const name = geo.properties.NAME || geo.properties.name;
+                const countryData = allCountries.find(c =>
+                    c.name.common === name ||
+                    c.name.official === name ||
+                    (c.altSpellings && c.altSpellings.includes(name))
+                  );
+                const isMatch = countryData && shouldHighlight(countryData);
+                const fillColor =
+                filters.region || filters.language
+                    ? (isMatch ? getColor(name) : '#eee')   // Filtering active
+                    : getColor(name);                       // No filtering, color all
+
+                return (
+                    <Geography
                     key={geo.rsmKey}
                     geography={geo}
                     onClick={() => handleCountryClick(geo)}
                     style={{
-                      default: {
-                        fill: getColor(geo.properties.NAME || geo.properties.name),
-                        stroke: '#ffffff',
+                        default: {
+                        fill: fillColor,
+                        stroke: '#fff',
                         strokeWidth: 0.6,
                         outline: 'none',
-                      },
-                      hover: {
-                        fill: '#007bff',
-                        cursor: 'pointer',
-                        outline: 'none',
-                      },
-                      pressed: {
+                        },
+                        hover: {
+                        fill: isMatch ? '#007bff' : '#ddd',
+                        cursor: isMatch ? 'pointer' : 'default',
+                        },
+                        pressed: {
                         fill: '#343a40',
                         outline: 'none',
-                      },
+                        }
                     }}
-                  />
-                ))
-              }
+                    />
+                );
+                })
+            }
             </Geographies>
           </ComposableMap>
         </div>
@@ -118,40 +154,61 @@ const HomePage = () => {
             <Modal.Title className="fw-bold">{selectedCountry?.name}</Modal.Title>
         </Modal.Header>
 
-        <Modal.Body className="text-center px-4 py-3">
-            {selectedCountry?.flag && (
+        <Modal.Body className="px-4 py-3">
+        {selectedCountry?.flag && (
             <div className="mb-4 d-flex justify-content-center">
-                <div className="bg-light rounded shadow-sm p-2" style={{ maxWidth: 120 }}>
+            <div className="bg-light rounded shadow-sm p-2" style={{ maxWidth: 120 }}>
                 <img
-                    src={selectedCountry.flag}
-                    alt="flag"
-                    className="img-fluid rounded"
-                    style={{ maxHeight: 100 }}
+                src={selectedCountry.flag}
+                alt="flag"
+                className="img-fluid rounded"
+                style={{ maxHeight: 100 }}
                 />
-                </div>
             </div>
-            )}
+            </div>
+        )}
 
-            <div className="text-start">
+        <div className="text-start">
             <div className="mb-2">
-                <span className="fw-semibold text-muted">
+            <span className="fw-semibold text-muted">
                 <span role="img" aria-label="capital">🏛️</span> Capital:
-                </span>{' '}
-                <span className="text-dark">{selectedCountry?.capital || 'N/A'}</span>
+            </span>{' '}
+            <span className="text-dark">{selectedCountry?.capital || 'N/A'}</span>
             </div>
             <div className="mb-2">
-                <span className="fw-semibold text-muted">
+            <span className="fw-semibold text-muted">
                 <span role="img" aria-label="region">🌐</span> Region:
-                </span>{' '}
-                <span className="text-dark">{selectedCountry?.region}</span>
+            </span>{' '}
+            <span className="text-dark">{selectedCountry?.region}</span>
             </div>
-            <div>
-                <span className="fw-semibold text-muted">
+            <div className="mb-2">
+            <span className="fw-semibold text-muted">
                 <span role="img" aria-label="population">👥</span> Population:
-                </span>{' '}
-                <span className="text-dark">{selectedCountry?.population?.toLocaleString()}</span>
+            </span>{' '}
+            <span className="text-dark">{selectedCountry?.population?.toLocaleString()}</span>
             </div>
+            <div className="mb-2">
+            <span className="fw-semibold text-muted">
+                <span role="img" aria-label="languages">🗣️</span> Languages:
+            </span>{' '}
+            <span className="text-dark">
+                {selectedCountry?.languages
+                ? Object.values(selectedCountry.languages).join(', ')
+                : 'N/A'}
+            </span>
             </div>
+        </div>
+        <Button
+            variant="success"
+            className="ms-2"
+            onClick={() => {
+                setQuizCountryName(selectedCountry.name);
+                setShowModal(false);         // ✅ Close the details modal
+                setShowQuiz(true);           // ✅ Show the quiz
+            }}
+            >
+            🧠 Take Quiz
+        </Button>
         </Modal.Body>
 
         <Modal.Footer className="bg-light rounded-bottom-4 d-flex justify-content-center">
@@ -160,6 +217,12 @@ const HomePage = () => {
             </Button>
         </Modal.Footer>
         </Modal>
+        <QuizModal
+            show={showQuiz}
+            onClose={() => setShowQuiz(false)}
+            countryName={quizCountryName}
+            />
+            
     </div>
   );
 };

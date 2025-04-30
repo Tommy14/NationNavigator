@@ -53,3 +53,23 @@
   .shadow-lg {
     box-shadow: 0 0 40px rgba(0, 0, 0, 0.1) !important;
   }
+
+  .sidebar {
+    width: 220px;
+    min-height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    border-right: 1px solid #dee2e6;
+  }
+  
+  .sidebar .nav-link {
+    padding: 10px 15px;
+    border-radius: 6px;
+  }
+  
+  .sidebar .nav-link:hover {
+    background-color: #495057;
+    color: #fff;
+  }

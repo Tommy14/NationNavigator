@@ -17,11 +17,21 @@ const AuthDropdown = ({ show, handleClose }) => {
     e.preventDefault();
     setError('');
     try {
-      const data = isLogin ? await loginUser(form) : await registerUser(form);
+      const data = isLogin
+        ? await loginUser(form)
+        : await registerUser(form);
+      
+      // ✅ Put it HERE:
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify({
+        username: data.username,
+        userId: data.userId
+      }));
   
+      // Optional: set user in context if using useAuth
       login({ username: data.username, userId: data.userId });
   
-      handleClose();
+      handleClose(); // close modal
     } catch (err) {
       setError(err.message || 'Something went wrong');
     }

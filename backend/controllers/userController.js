@@ -48,3 +48,32 @@ export const getMe = async (req, res) => {
       res.status(500).json({ message: err.message });
     }
   };
+
+  export const addUserBadge = async (req, res) => {
+    try {
+      const { badge } = req.body;
+      const user = await User.findById(req.params.id);
+  
+      if (!user) return res.status(404).json({ message: 'User not found' });
+  
+      if (!user.badges.includes(badge)) {
+        user.badges.push(badge);
+        await user.save();
+      }
+  
+      res.status(200).json({ message: 'Badge added', badges: user.badges });
+    } catch (err) {
+      res.status(500).json({ message: 'Server error', error: err.message });
+    }
+  };
+  
+  export const getUserBadges = async (req, res) => {
+    try {
+      const user = await User.findById(req.params.id);
+      if (!user) return res.status(404).json({ message: 'User not found' });
+  
+      res.status(200).json(user.badges);
+    } catch (err) {
+      res.status(500).json({ message: 'Server error', error: err.message });
+    }
+  };

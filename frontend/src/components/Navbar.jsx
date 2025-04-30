@@ -1,36 +1,45 @@
 import React, { useState } from 'react';
-import { Navbar, Nav, Container, Button } from 'react-bootstrap';
-import AuthDropdown from './AuthDropdown';
+import { Navbar, Nav, Container, Button, Dropdown } from 'react-bootstrap';
 import { useAuth } from '../context/AuthContext';
+import BadgeGalleryModal from './BadgeGalleryModal';
 
 const AppNavbar = () => {
   const { user, logout } = useAuth();
-  const [showAuth, setShowAuth] = useState(false);
+  const [showBadges, setShowBadges] = useState(false);
 
   return (
     <>
       <Navbar bg="dark" variant="dark" expand="md" fixed="top">
         <Container>
           <Navbar.Brand href="/">
-            <span role="img" aria-label="globe">🌐</span> Country Explorer
+            <span role="img" aria-label="globe">🌍</span> Country Explorer
           </Navbar.Brand>
-          <Navbar.Toggle aria-controls="main-navbar" />
-          <Navbar.Collapse id="main-navbar" className="justify-content-end">
+          <Navbar.Toggle />
+          <Navbar.Collapse className="justify-content-end">
             <Nav>
               {user ? (
                 <>
-                  <Navbar.Text className="me-3">Hi, {user.username}</Navbar.Text>
-                  <Button onClick={logout} variant="outline-light" size="sm">Logout</Button>
+                  <Dropdown align="end">
+                    <Dropdown.Toggle variant="outline-light" id="user-dropdown" size="sm">
+                      Hi, {user.username}
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                      <Dropdown.Item onClick={() => setShowBadges(true)}>🏅 My Badges</Dropdown.Item>
+                      <Dropdown.Divider />
+                      <Dropdown.Item onClick={logout}>Logout</Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
                 </>
               ) : (
-                <Button onClick={() => setShowAuth(true)} variant="outline-light" size="sm">Login / Register</Button>
+                <Button variant="outline-light" size="sm">Login / Register</Button>
               )}
             </Nav>
           </Navbar.Collapse>
         </Container>
       </Navbar>
 
-      <AuthDropdown show={showAuth} handleClose={() => setShowAuth(false)} />
+      {/* 🏅 Badge Modal */}
+      <BadgeGalleryModal show={showBadges} onClose={() => setShowBadges(false)} />
     </>
   );
 };
