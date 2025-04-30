@@ -29,11 +29,14 @@ const HomePage = () => {
   const handleClose = () => setShowModal(false);
 
   return (
-    <div className="min-vh-100 bg-light">
+    <div className="min-vh-100 bg-gradient" style={{ background: 'linear-gradient(to right, #f8f9fa, #e9ecef)' }}>
       <Navbar />
 
       <div className="pt-5 px-3 d-flex justify-content-center">
-        <div style={{ width: '100%', maxWidth: '1200px', height: '600px' }}>
+        <div
+          className="shadow-lg bg-white rounded p-3"
+          style={{ width: '100%', maxWidth: '1200px', height: '600px' }}
+        >
           <ComposableMap
             projectionConfig={{ scale: 160 }}
             width={980}
@@ -47,9 +50,21 @@ const HomePage = () => {
                     geography={geo}
                     onClick={() => handleCountryClick(geo)}
                     style={{
-                      default: { fill: '#D6D6DA', outline: 'none' },
-                      hover: { fill: '#FF5722', outline: 'none' },
-                      pressed: { fill: '#FF7043', outline: 'none' },
+                      default: {
+                        fill: '#D6D6DA',
+                        outline: 'none',
+                        transition: 'all 0.3s ease-in-out',
+                      },
+                      hover: {
+                        fill: '#0d6efd',
+                        cursor: 'pointer',
+                        transform: 'scale(1.01)',
+                        outline: 'none',
+                      },
+                      pressed: {
+                        fill: '#6610f2',
+                        outline: 'none',
+                      },
                     }}
                   />
                 ))
@@ -59,17 +74,23 @@ const HomePage = () => {
         </div>
       </div>
 
-      {/* Bootstrap Modal */}
-      <Modal show={showModal} onHide={handleClose} centered>
+      {/* 🔍 Pretty Modal */}
+      <Modal
+        show={showModal}
+        onHide={handleClose}
+        centered
+        backdropClassName="blur-background"
+        contentClassName="rounded shadow-lg"
+      >
         <Modal.Header closeButton>
-          <Modal.Title>{selectedCountry?.name}</Modal.Title>
+          <Modal.Title className="fw-bold">{selectedCountry?.name}</Modal.Title>
         </Modal.Header>
         <Modal.Body className="text-center">
           {selectedCountry?.flag && (
             <img
               src={selectedCountry.flag}
               alt="flag"
-              className="img-fluid mb-3"
+              className="img-fluid mb-3 rounded shadow-sm"
               style={{ maxHeight: 100 }}
             />
           )}

@@ -40,3 +40,8 @@
     margin: 0 auto 12px auto;
     display: block;
   }
+
+  .blur-background {
+    backdrop-filter: blur(5px);
+    background-color: rgba(0, 0, 0, 0.2);
+  }
