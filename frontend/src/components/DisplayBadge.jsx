@@ -12,7 +12,7 @@ const DisplayBadges = ({ onClose }) => {
       try {
         const token = localStorage.getItem('accessToken'); // Retrieve the token from localStorage
         const response = await axios.get(
-          `/api/users/${user?.username}/badges`,
+          `https://nationnavigator.onrender.com/api/users/${user?.username}/badges`,
           {
             withCredentials: true,
             headers: {
