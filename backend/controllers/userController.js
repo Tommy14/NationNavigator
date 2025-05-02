@@ -3,28 +3,35 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 export const registerUser = async (req, res) => {
-  const { username, password } = req.body;
+  const { username, email, password } = req.body;
   try {
-    const userExists = await User.findOne({ username });
+    const userExists = await User.findOne({ email });
     if (userExists) return res.status(400).json({ message: 'Username already exists' });
 
     const salt = await bcrypt.genSalt(10);
     const hashed = await bcrypt.hash(password, salt);
 
-    const user = await User.create({ username, password: hashed });
+    const user = await User.create({ username, email, password: hashed });
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
 
-    res.status(201).json({ userId: user._id, username: user.username, token });
+    res.status(201).json({
+      user: {
+        userId: user._id,
+        username: user.username,
+        email: user.email
+      },
+      accessToken: token
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
 export const loginUser = async (req, res) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
   try {
-    const user = await User.findOne({ username });
+    const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: 'Invalid credentials' });
 
     const match = await bcrypt.compare(password, user.password);
@@ -32,7 +39,14 @@ export const loginUser = async (req, res) => {
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
 
-    res.json({ userId: user._id, username: user.username, token });
+    res.status(200).json({
+      user: {
+        userId: user._id,
+        username: user.username,
+        email: user.email
+      },
+      accessToken: token
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -46,5 +60,35 @@ export const getMe = async (req, res) => {
       });
     } catch (err) {
       res.status(500).json({ message: err.message });
+    }
+  };
+
+  export const addBadgeToUser = async (req, res) => {
+    try {
+      const user = await User.findOne({ username: req.params.username });
+      if (!user) return res.status(404).json({ message: 'User not found' });
+  
+      const { badge } = req.body;
+  
+      // Prevent duplicate badges
+      if (!user.badges.includes(badge)) {
+        user.badges.push(badge);
+        await user.save();
+      }
+  
+      res.status(200).json({ message: 'Badge added successfully', badges: user.badges });
+    } catch (err) {
+      res.status(500).json({ message: 'Failed to add badge', error: err.message });
+    }
+  };
+  
+  export const getUserBadges = async (req, res) => {
+    try {
+      const user = await User.findOne({ username: req.params.username });
+      if (!user) return res.status(404).json({ message: 'User not found' });
+  
+      res.status(200).json(user.badges);
+    } catch (err) {
+      res.status(500).json({ message: 'Server error', error: err.message });
     }
   };
