@@ -109,7 +109,7 @@ const Quiz = ({ country, onFinish, onClose }) => {
     try {
         console.log("User:", user);
       if (!user?.username || !country.cca3) return;
-      await axios.post(`http://localhost:9000/api/users/${user.username}/badges`, // or user.id
+      await axios.post(`https://nationnavigator.onrender.com/api/users/${user.username}/badges`, // or user.id
         { badge: country.cca3 },
         {
           headers: {
