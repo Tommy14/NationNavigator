@@ -2,7 +2,13 @@ import React, { useEffect, useRef, useState, useMemo } from "react";
 import Globe from "react-globe.gl";
 import { feature } from "topojson-client";
 
-const GlobeVisualization = ({ viewMode = "realistic", isRotating = true, onCountryClick, filteredCountryNames = [] }) => {
+const GlobeVisualization = ({
+  viewMode = "realistic",
+  isRotating = true,
+  onCountryClick,
+  filteredCountryNames = [],
+  theme = "dark",
+}) => {
   const [countries, setCountries] = useState({ features: [] });
   const [isLoading, setIsLoading] = useState(true);
   const globeRef = useRef();
@@ -17,6 +23,11 @@ const GlobeVisualization = ({ viewMode = "realistic", isRotating = true, onCount
     night: "//unpkg.com/three-globe/example/img/earth-night.jpg",
     topo: "//unpkg.com/three-globe/example/img/earth-topology.png",
     cartoon: "https://unpkg.com/three-globe/example/img/earth-dark.jpg",
+  };
+
+  const backgroundImageUrls = {
+    dark: "//unpkg.com/three-globe/example/img/night-sky.png",
+    light: "", // you can replace with a light-mode sky image URL if desired
   };
 
   // Load country data
@@ -76,7 +87,7 @@ const GlobeVisualization = ({ viewMode = "realistic", isRotating = true, onCount
         <Globe
           ref={globeRef}
           globeImageUrl={globeImageUrls[viewMode]} 
-          backgroundImageUrl="//unpkg.com/three-globe/example/img/night-sky.png"
+          backgroundImageUrl={backgroundImageUrls[theme]}
           polygonsData={countries.features}
           polygonAltitude={d => (highlightSet.has(d.properties.name) ? 0.06 : 0.01)}
           polygonCapColor={d =>

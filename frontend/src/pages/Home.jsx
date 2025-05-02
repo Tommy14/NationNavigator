@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import Navbar from '../components/NavBar';
 import GlobeVisualization from "../components/GlobeVisualization";
 import GlobeControls from "../components/GlobeControls";
@@ -10,6 +10,21 @@ export default function Home() {
   const [isRotating, setIsRotating] = useState(true);
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [filteredCountryNames, setFilteredCountryNames] = useState([]);
+
+  // Theme state: 'dark' or 'light'
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem('theme') || 'dark'
+  );
+
+  // Persist theme to localStorage
+  useEffect(() => {
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  // Toggle between dark and light modes
+  const toggleTheme = useCallback(() => {
+    setTheme(t => (t === 'dark' ? 'light' : 'dark'));
+  }, []);
 
   const toggleRotation = useCallback(() => {
     setIsRotating(prev => !prev);
@@ -32,8 +47,16 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="w-full h-full flex flex-col">
-      <Navbar onFilterChange={setFilteredCountryNames} />
+    <div
+      className={`w-full h-full flex flex-col ${
+        theme === 'dark' ? 'bg-black text-white' : 'bg-white text-black'
+      }`}
+    >
+      <Navbar
+        theme={theme}
+        onToggleTheme={toggleTheme}
+        onFilterChange={setFilteredCountryNames}
+      />
       {/* Main content */}
       <main className="flex-grow relative">
         <GlobeVisualization 
@@ -41,6 +64,7 @@ export default function Home() {
           isRotating={isRotating}
           onCountryClick={handleCountryClick}
           filteredCountryNames={filteredCountryNames}
+          theme={theme}
         />
       </main>
 
