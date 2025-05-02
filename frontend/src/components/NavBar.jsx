@@ -5,12 +5,14 @@ import { useAuth } from '../context/AuthContext';
 import DisplayBadges from './DisplayBadge'; // Import the DisplayBadges component
 import LoginForm from './LoginForm';
 import SignupForm from './SignUpForm';
+import AllCountries from './AllCountries';
 import { motion } from 'framer-motion';
 import { FiUser, FiUserPlus, FiFilter, FiSun, FiMoon, FiLogIn } from 'react-icons/fi';
 import logoDark from '../assets/logo-dark.png';
 import logoLight from '../assets/logo-light.png';
 
-const Navbar = ({ onFilterChange, theme, onToggleTheme }) => {
+
+const Navbar = ({ onFilterChange, theme, onToggleTheme, onShowAll }) => {
   const [showBadges, setShowBadges] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
@@ -18,6 +20,7 @@ const Navbar = ({ onFilterChange, theme, onToggleTheme }) => {
   const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showList, setShowList] = useState(false);
 
   // New states for search and filter
   const [searchQuery, setSearchQuery] = useState('');
@@ -75,8 +78,16 @@ const Navbar = ({ onFilterChange, theme, onToggleTheme }) => {
   return (
     <nav className={`${theme === 'dark' ? 'bg-black text-white' : 'bg-white text-black'} shadow-md relative z-50`}>
       <div className="max-w-1xl mx-auto py-4 flex items-center justify-between">
-        {/* Logo */}
-        <Link to="/" className="flex items-center space-x-2 ml-4">
+        {/* Logo - show all countries on click */}
+        <button
+          onClick={() => {
+            setShowList(true);
+            setMenuOpen(false);
+            setDropdownOpen(false);
+          }}
+          className="flex items-center space-x-2 ml-4 focus:outline-none"
+          aria-label="Show All Countries"
+        >
           <img
             src={theme === 'dark' ? logoDark : logoLight}
             alt="NationNavigator Logo"
@@ -85,7 +96,7 @@ const Navbar = ({ onFilterChange, theme, onToggleTheme }) => {
           <span className={`text-2xl font-bold tracking-wide ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
             NationNavigator
           </span>
-        </Link>
+        </button>
         {/* Mobile menu toggle */}
         <button
           onClick={() => setMenuOpen(o => !o)}
@@ -94,7 +105,7 @@ const Navbar = ({ onFilterChange, theme, onToggleTheme }) => {
           {menuOpen ? '✕' : '☰'}
         </button>
         {/* Nav items */}
-        <div className={`${menuOpen ? 'flex' : 'hidden'} flex-col md:flex md:flex-row md:items-center w-full md:w-auto md:space-x-4 space-y-2 md:space-y-0 px-4 md:px-0`}>
+        <div className={`${menuOpen ? 'flex' : 'hidden'} flex-col md:flex md:flex-row md:items-center w-full md:w-auto md:space-x-4 space-y-2 md:space-y-0 px-4 md:px-0`}>          
           {/* Filter toggle */}
           <button
             onClick={() => setShowFilter(f => !f)}
@@ -297,6 +308,23 @@ const Navbar = ({ onFilterChange, theme, onToggleTheme }) => {
               Cancel
             </button>
           </motion.div>
+        </div>
+      )}
+      {/* All Countries List Overlay */}
+      {showList && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="rounded-lg shadow-lg w-full max-w-4xl h-full max-h-[90vh] overflow-auto">
+            <button
+              onClick={() => setShowList(false)}
+              className="p-2 text-right w-full text-black"
+            >✕</button>
+            <AllCountries
+              onSelectCountry={(country) => {
+                setShowList(false);
+                onShowAll && onShowAll(country);
+              }}
+            />
+          </div>
         </div>
       )}
     </nav>

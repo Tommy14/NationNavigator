@@ -2,13 +2,25 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import CountryDetails from './CountryDetails';
+import { FiX } from 'react-icons/fi';
 
-export default function AllCountries() {
+export default function AllCountries({ onClose }) {
   const [countries, setCountries] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // 1) Fetch all countries on mount
+  // Close modal on Escape key
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [onClose]);
+
+  // Fetch all countries once
   useEffect(() => {
     (async () => {
       try {
@@ -22,12 +34,13 @@ export default function AllCountries() {
     })();
   }, []);
 
-  // 2) Show loader while fetching
   if (loading) {
-    return <div className="p-4 text-center">Loading countries…</div>;
+    return (
+      <div className="p-4 text-center text-white">Loading countries…</div>
+    );
   }
 
-  // 3) If one is selected, show CountryDetails + back button
+  // Show details view
   if (selectedCountry) {
     return (
       <div className="p-4">
@@ -42,23 +55,38 @@ export default function AllCountries() {
     );
   }
 
-  // 4) Otherwise render the flag grid
+  // Main modal
   return (
-    <div className="p-4 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4">
-      {countries.map((c) => (
+      <div
+        className="relative bg-gray-900 bg-opacity-80 backdrop-blur-xl rounded-lg text-white w-11/12 max-w-4xl mx-auto p-6 max-h-[80vh] overflow-y-auto"
+        onClick={e => e.stopPropagation()}
+      >
+
+        {/* Title */}
+        <h2 className="text-2xl font-bold mb-4 text-center">All Countries</h2>
+
+        {/* Flag grid with scroll */}
         <div
-          key={c.cca3}
-          className="cursor-pointer text-center hover:shadow-lg rounded overflow-hidden transition"
-          onClick={() => setSelectedCountry(c)}
+          className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-6 overflow-y-auto"
+          style={{ maxHeight: '60vh' }}
         >
-          <img
-            src={c.flags.svg}
-            alt={`Flag of ${c.name.common}`}
-            className="w-full h-24 object-cover"
-          />
-          <p className="mt-2 font-medium">{c.name.common}</p>
+          {countries.map(c => (
+            <div
+              key={c.cca3}
+              className="cursor-pointer text-center hover:shadow-xl rounded-lg overflow-hidden transition"
+              onClick={() => setSelectedCountry(c)}
+            >
+              <img
+                src={c.flags.svg}
+                alt={`Flag of ${c.name.common}`}
+                className="w-full h-24 object-cover"
+              />
+              <p className="mt-2 font-medium text-white truncate">
+                {c.name.common}
+              </p>
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
+      </div>
   );
 }

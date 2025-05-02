@@ -175,7 +175,7 @@ const Quiz = ({ country, onFinish, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="p-6 bg-white shadow-lg rounded-xl max-w-xl w-full relative flex">
+      <div className="p-6 bg-white dark:bg-gray-800 text-black dark:text-white shadow-lg rounded-xl max-w-xl w-full relative flex">
         <div className="flex-1 flex flex-col">
           <button
             onClick={onClose}

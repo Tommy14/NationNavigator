@@ -29,10 +29,6 @@ export default function Home() {
     setIsRotating(prev => !prev);
   }, []);
 
-  const handleResetView = useCallback(() => {
-    console.log("Reset view triggered");
-  }, []);
-
   const handleCountryClick = useCallback(async (countryName) => {
     try {
       const countryData = await fetchCountryDetails(countryName);
@@ -69,9 +65,12 @@ export default function Home() {
 
       {/* Optional: Add a close button for country info */}
       {selectedCountry && (
-      <div className="absolute bottom-8 right-8 z-10">
-        <CountryDetails country={selectedCountry} />
-      </div>
+        <div className="absolute bottom-8 right-8 z-10">
+          <CountryDetails
+            country={selectedCountry}
+            onClose={() => setSelectedCountry(null)}
+          />
+        </div>
       )}
     </div>
   );

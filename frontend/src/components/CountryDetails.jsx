@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import Quiz from './Quiz';
+import { FiX } from 'react-icons/fi';
 
-const CountryDetails = ({ country }) => {
+const CountryDetails = ({ country, onClose }) => {
     const [isQuizOpen, setIsQuizOpen] = useState(false);
     const [showLoginMessage, setShowLoginMessage] = useState(false);
     if (!country) return null;
@@ -29,7 +30,15 @@ const CountryDetails = ({ country }) => {
     }
 
     return (
-        <div className="bg-white/30 backdrop-blur-md border border-white/10 shadow-md rounded-xl p-6 text-white w-full max-w-md mx-auto">
+        <div className="relative bg-white/30 backdrop-blur-md border border-white/10 shadow-md rounded-xl p-6 text-white w-full max-w-md mx-auto">
+            {/* Close icon */}
+            <button
+              onClick={onClose}
+              className="absolute top-3 right-3 p-1 text-white hover:text-gray-300"
+              aria-label="Close details"
+            >
+              <FiX size={20} />
+            </button>
             <div className="flex items-center gap-4 mb-4">
                 <img src={flags.svg} alt={`${name.common} flag`} className="w-16 h-12 rounded shadow" />
                 <div>
@@ -63,6 +72,16 @@ const CountryDetails = ({ country }) => {
             {showLoginMessage && (
                 <p className="mt-2 text-sm text-red-200">Please login to start the quiz.</p>
             )}
+            <div className="mt-4 flex justify-center">
+              <a
+                href={`https://en.wikipedia.org/wiki/${name.common.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                More
+              </a>
+            </div>
         </div>
     );
 };
