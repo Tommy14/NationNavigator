@@ -1,13 +1,16 @@
-import axios from 'axios';
+// src/services/countryService.js
 
-const BASE_URL = 'https://restcountries.com/v3.1';
-
-export const getCountryByName = async (name) => {
-  try {
-    const res = await axios.get(`${BASE_URL}/name/${name}?fullText=true`);
-    return res.data[0]; // first match
-  } catch (err) {
-    console.error("Country not found:", name);
-    return null;
+export async function fetchCountryDetails(countryName) {
+    try {
+      const response = await fetch(`https://restcountries.com/v3.1/name/${countryName}?fullText=true`);
+      if (!response.ok) {
+        throw new Error(`Error fetching ${countryName}: ${response.statusText}`);
+      }
+  
+      const data = await response.json();
+      return data[0]; // Assuming you want the first matching result
+    } catch (error) {
+      console.error("Failed to fetch country data:", error);
+      return null;
+    }
   }
-};
