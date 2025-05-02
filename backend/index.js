@@ -9,9 +9,19 @@ dotenv.config();
 const app = express();
 
 // ✅ Apply proper CORS config BEFORE your routes
+const allowedOrigins = [
+  'https://nation-navigator-pf68.vercel.app'
+];
+
 app.use(cors({
-  origin: 'https://nation-navigator-pf68.vercel.app/',
-  credentials: true                 
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin.replace(/\/$/, ''))) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
 }));
 
 // Connect to DB
