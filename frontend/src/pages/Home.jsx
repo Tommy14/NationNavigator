@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
 import Navbar from '../components/NavBar';
 import GlobeVisualization from "../components/GlobeVisualization";
-import GlobeControls from "../components/GlobeControls";
 import { fetchCountryDetails } from "../services/countryService";
 import CountryDetails from '../components/CountryDetails';
 

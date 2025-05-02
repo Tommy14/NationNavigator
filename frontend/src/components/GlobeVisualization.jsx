@@ -27,7 +27,8 @@ const GlobeVisualization = ({
 
   const backgroundImageUrls = {
     dark: "//unpkg.com/three-globe/example/img/night-sky.png",
-    light: "", // you can replace with a light-mode sky image URL if desired
+    // Using a light sky-like PNG from the same CDN
+    light: "https://unpkg.com/three-globe/example/img/earth-dark.jpg",
   };
 
   // Load country data
