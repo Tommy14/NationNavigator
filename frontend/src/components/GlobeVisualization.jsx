@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Globe from "react-globe.gl";
 import { feature } from "topojson-client";
 
-const GlobeVisualization = ({ viewMode = "realistic", isRotating = true }) => {
+const GlobeVisualization = ({ viewMode = "realistic", isRotating = true, onCountryClick }) => {
   const [countries, setCountries] = useState({ features: [] });
   const [isLoading, setIsLoading] = useState(true);
   const globeRef = useRef();
@@ -79,7 +79,13 @@ const GlobeVisualization = ({ viewMode = "realistic", isRotating = true }) => {
           polygonStrokeColor={() => "rgba(255, 255, 255, 0.3)"}
           polygonLabel={getPolygonLabel}
           width={window.innerWidth}
-          height={window.innerHeight - 80} 
+          height={window.innerHeight } 
+          onPolygonClick={(polygon) => {
+            const name = polygon?.properties?.name;
+            if (name && onCountryClick) {
+              onCountryClick(name);
+            }
+          }}
         />
       )}
     </div>

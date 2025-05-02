@@ -8,6 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const authInitializedRef = useRef(false); // Use ref instead of state to avoid re-renders
+  const [sessionExpiry, setSessionExpiry] = useState(null);
 
   useEffect(() => {
     // Check if user is already logged in - only run once
@@ -24,7 +25,13 @@ export const AuthProvider = ({ children }) => {
       try {
         setLoading(true);
         const userData = await getCurrentUser();
-        setUser(userData);
+        const savedUser = localStorage.getItem("user");
+        if (savedUser) {
+          setUser(JSON.parse(savedUser));
+        } else {
+          setUser(userData);
+          localStorage.setItem("user", JSON.stringify(userData));
+        }
       } catch (err) {
         console.error('Auth initialization failed:', err);
         
@@ -33,7 +40,13 @@ export const AuthProvider = ({ children }) => {
           try {
             await refreshAccessToken();
             const userData = await getCurrentUser();
-            setUser(userData);
+            const savedUser = localStorage.getItem("user");
+            if (savedUser) {
+              setUser(JSON.parse(savedUser));
+            } else {
+              setUser(userData);
+              localStorage.setItem("user", JSON.stringify(userData));
+            }
           } catch (refreshErr) {
             console.error('Refresh token failed:', refreshErr);
             setUser(null);
@@ -53,7 +66,16 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       const data = await loginUser(credentials);
-      setUser(data.user);
+      setUser({
+        username: data.user.username,
+        email: data.user.email
+      });
+      localStorage.setItem("user", JSON.stringify({ username: data.user.username, email: data.user.email }));
+  
+      // Assuming the token expires in 1 hour — customize as needed
+      const expiresAt = Date.now() + 60 * 60 * 1000; // 1 hour
+      setSessionExpiry(expiresAt);
+      localStorage.setItem("sessionExpiry", expiresAt);
       return data;
     } catch (err) {
       setError(err.message);
@@ -68,7 +90,11 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       const data = await registerUser(userData);
-      setUser(data.user);
+      setUser({
+        username: data.user.username,
+        email: data.user.email
+      });
+      localStorage.setItem("user", JSON.stringify({ username: data.user.username, email: data.user.email }));
       return data;
     } catch (err) {
       setError(err.message);
@@ -81,11 +107,14 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       setLoading(true);
-      await logoutUser();
-      setUser(null);
+      await logoutUser(); // optional, backend logout
     } catch (err) {
       setError(err.message);
     } finally {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("sessionExpiry");
+      localStorage.removeItem("user");
+      setUser(null);
       setLoading(false);
     }
   };
@@ -98,6 +127,31 @@ export const AuthProvider = ({ children }) => {
       throw err;
     }
   };
+
+  useEffect(() => {
+    const storedExpiry = localStorage.getItem("sessionExpiry");
+    if (storedExpiry) {
+      setSessionExpiry(parseInt(storedExpiry));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!sessionExpiry) return;
+  
+    const now = Date.now();
+    const remainingTime = sessionExpiry - now;
+  
+    if (remainingTime <= 0) {
+      logout();
+      return;
+    }
+  
+    const timeout = setTimeout(() => {
+      logout();
+    }, remainingTime);
+  
+    return () => clearTimeout(timeout);
+  }, [sessionExpiry]);
 
   return (
     <AuthContext.Provider

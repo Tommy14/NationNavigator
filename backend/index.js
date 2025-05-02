@@ -7,13 +7,21 @@ import userRoutes from './routes/userRoutes.js';
 dotenv.config();
 
 const app = express();
-app.use(cors());
-app.use(express.json());
+
+// ✅ Apply proper CORS config BEFORE your routes
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true                 
+}));
 
 // Connect to DB
 connectDB();
 
-app.use('/api/users', userRoutes);
+// ✅ Middleware
+app.use(express.json());
+
+// ✅ Your routes (after cors + json)
+app.use('/api/users', userRoutes); // example
 
 const PORT = process.env.PORT || 9000;
 app.listen(PORT, () => {

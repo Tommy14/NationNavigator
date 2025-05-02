@@ -2,8 +2,9 @@ import api from './api';
 
 // Register a new user
 export const registerUser = async (userData) => {
+  console.log('Registering user:', userData);
   try {
-    const response = await api.post('/api/auth/register', userData);
+    const response = await api.post('/api/users/register', userData);
     localStorage.setItem('accessToken', response.data.accessToken);
     return response.data;
   } catch (error) {
@@ -17,7 +18,11 @@ export const registerUser = async (userData) => {
 // Login existing user
 export const loginUser = async (credentials) => {
   try {
-    const response = await api.post('/api/auth/login', credentials);
+    console.log('Logging in with credentials:', credentials);
+    const response = await api.post('/api/users/login', {
+      email: credentials.email,
+      password: credentials.password
+    });
     localStorage.setItem('accessToken', response.data.accessToken);
     return response.data;
   } catch (error) {
@@ -44,7 +49,7 @@ export const logoutUser = async () => {
 // Get current user info
 export const getCurrentUser = async () => {
   try {
-    const response = await api.get('/api/auth/me');
+    const response = await api.get('/api/users/me');
     return response.data;
   } catch (error) {
     throw error;
