@@ -1,45 +1,55 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback } from "react";
+import Navbar from '../components/NavBar';
 import GlobeVisualization from "../components/GlobeVisualization";
 import GlobeControls from "../components/GlobeControls";
 import { fetchCountryDetails } from "../services/countryService";
-import Navbar from "../components/NavBar";
-
+import CountryDetails from '../components/CountryDetails';
 
 export default function Home() {
-  // Globe configuration state
   const [viewMode, setViewMode] = useState("realistic");
   const [isRotating, setIsRotating] = useState(true);
-  
-  // Functions to control the globe
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [filteredCountryNames, setFilteredCountryNames] = useState([]);
+
   const toggleRotation = useCallback(() => {
     setIsRotating(prev => !prev);
   }, []);
-  
+
   const handleResetView = useCallback(() => {
-    // This will be implemented in the GlobeVisualization component
-    // We're just providing the function here for the controls
     console.log("Reset view triggered");
-    // You might want to trigger a ref method from GlobeVisualization
   }, []);
 
   const handleCountryClick = useCallback(async (countryName) => {
-    const countryData = await fetchCountryDetails(countryName);
-    if (countryData) {
-      console.log("Country Data:", countryData);
+    try {
+      const countryData = await fetchCountryDetails(countryName);
+      if (countryData) {
+        setSelectedCountry(countryData); // 💡 store in state
+      }
+      console.log("COuntry data:", countryData);
+    } catch (err) {
+      console.error("Failed to fetch country:", err);
     }
   }, []);
 
   return (
-    
-    <div className="w-full h-full flex flex-col">      
-      {/* Main content - takes all remaining space */}
+    <div className="w-full h-full flex flex-col">
+      <Navbar onFilterChange={setFilteredCountryNames} />
+      {/* Main content */}
       <main className="flex-grow relative">
         <GlobeVisualization 
           viewMode={viewMode}
           isRotating={isRotating}
           onCountryClick={handleCountryClick}
+          filteredCountryNames={filteredCountryNames}
         />
       </main>
+
+      {/* Optional: Add a close button for country info */}
+      {selectedCountry && (
+      <div className="absolute bottom-8 right-8 z-10">
+        <CountryDetails country={selectedCountry} />
+      </div>
+      )}
     </div>
   );
 }

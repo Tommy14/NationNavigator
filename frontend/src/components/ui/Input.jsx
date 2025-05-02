@@ -14,12 +14,9 @@ const Input = ({
   return (
     <div className="mb-4">
       {label && (
-        <label 
-          htmlFor={id} 
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          {label} {required && <span className="text-red-500">*</span>}
-        </label>
+        <label htmlFor={id} className="block text-sm font-medium text-indigo-100 mb-1">
+        {label}
+      </label>
       )}
       <input
         id={id}

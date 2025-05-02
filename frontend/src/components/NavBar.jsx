@@ -1,16 +1,64 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import LoginForm from './LoginForm';
-import SignupForm from './SignUpForm.jsx';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { motion } from 'framer-motion';
-import { FiUser } from 'react-icons/fi';
+import DisplayBadges from './DisplayBadge'; // Import the DisplayBadges component
 
-const Navbar = () => {
-  const [showLogin, setShowLogin] = useState(false);
-  const [showSignup, setShowSignup] = useState(false);
+const Navbar = ({ onFilterChange }) => {
+  const [showBadges, setShowBadges] = useState(false);
   const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  // New states for search and filter
+  const [searchQuery, setSearchQuery] = useState('');
+  const [continentFilter, setContinentFilter] = useState('');
+
+  const [countries, setCountries] = useState([]);
+  const [loadingCountries, setLoadingCountries] = useState(false);
+
+  const nameToCca3 = Object.fromEntries(
+    allCountries.map(c => [c.name.common.toLowerCase(), c.cca3])
+  );
+  const handleSearch = e => {
+    const q = e.target.value.toLowerCase();
+    const code = nameToCca3[q];
+    setSearchQuery(code || '');  // searches by code
+  };
+
+  // Handle continent filter change
+  const handleContinentChange = (e) => {
+    setContinentFilter(e.target.value);
+  };
+
+  useEffect(() => {
+    const fetchCountries = async () => {
+      setLoadingCountries(true);
+      try {
+        let url = '';
+        if (searchQuery) {
+          // Search by name
+          url = `https://restcountries.com/v3.1/name/${searchQuery}`;
+        } else if (continentFilter) {
+          // Filter by region
+          url = `https://restcountries.com/v3.1/region/${continentFilter}`;
+        } else {
+          // Fetch all
+          url = 'https://restcountries.com/v3.1/all';
+        }
+        const response = await axios.get(url);
+        setCountries(response.data);
+        onFilterChange(response.data.map(c => c.name.common));
+      } catch (error) {
+        console.error('Error fetching countries:', error);
+        setCountries([]);
+        onFilterChange([]);
+      } finally {
+        setLoadingCountries(false);
+      }
+    };
+
+    fetchCountries();
+  }, [searchQuery, continentFilter]);
 
   return (
     <nav className="bg-black text-white shadow-md relative z-50">
@@ -20,88 +68,84 @@ const Navbar = () => {
           Country Explorer
         </Link>
 
+        {/* Search bar */}
+        <div className="relative">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={handleSearch}
+            placeholder="Search countries"
+            className="px-4 py-2 rounded-md text-black"
+          />
+        </div>
+
+        {/* Continent Filter */}
+        <select
+          value={continentFilter}
+          onChange={handleContinentChange}
+          className="bg-indigo-600 text-white px-4 py-2 rounded-md"
+        >
+          <option value="">Filter by Continent</option>
+          <option value="Africa">Africa</option>
+          <option value="Americas">Americas</option>
+          <option value="Asia">Asia</option>
+          <option value="Europe">Europe</option>
+          <option value="Oceania">Oceania</option>
+        </select>
+
+        {loadingCountries ? (
+          <div className="text-white ml-4">Loading...</div>
+        ) : (
+          <div className="text-white ml-4">{countries.length} countries found</div>
+        )}
+
         {/* Login / Sign Up Button */}
         {user ? (
-        <div className="relative mr-4">
+          <div className="relative mr-4">
             <button
-            onClick={() => setDropdownOpen(prev => !prev)}
-            className="bg-white text-indigo-700 px-5 py-2 rounded-md font-semibold hover:bg-gray-100 transition"
+              onClick={() => setDropdownOpen((prev) => !prev)}
+              className="bg-white text-indigo-700 px-5 py-2 rounded-md font-semibold hover:bg-gray-100 transition"
             >
-            Hi, {user.username}
+              Hi, {user.username}
             </button>
             {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-40 bg-white text-black rounded shadow-lg z-50">
+              <div className="absolute right-0 mt-2 w-40 bg-white text-black rounded shadow-lg z-50">
                 <button
-                onClick={() => {
+                  onClick={() => {
+                    setShowBadges(true);
+                    setDropdownOpen(false);
+                  }}
+                  className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                >
+                  View Badges
+                </button>
+                <button
+                  onClick={() => {
                     logout();
                     setDropdownOpen(false);
-                }}
-                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                  }}
+                  className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                 >
-                Logout
+                  Logout
                 </button>
-            </div>
+              </div>
             )}
-        </div>
+          </div>
         ) : (
-        <button
+          <button
             onClick={() => {
-            setShowSignup(false);
-            setShowLogin(true);
+              setShowBadges(false);
+              setDropdownOpen(false);
             }}
             className="bg-white text-indigo-700 px-5 py-2 rounded-md font-semibold hover:bg-gray-100 transition mr-3"
-        >
+          >
             Login / Sign Up
-        </button>
+          </button>
         )}
       </div>
 
-      {/* Login Modal */}
-      {showLogin && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-8 rounded-2xl w-full max-w-md shadow-xl">
-            <h3 className="text-2xl font-semibold mb-6 text-center text-indigo-700">Welcome Back 👋</h3>
-            <LoginForm onSuccess={() => {
-                setShowLogin(false);
-                navigate('/'); // from parent
-            }} />
-            <div className="mt-6 text-center text-sm text-gray-600">
-              Don’t have an account?{" "}
-              <button
-                onClick={() => {
-                  setShowLogin(false);
-                  setShowSignup(true);
-                }}
-                className="text-indigo-600 font-medium hover:underline"
-              >
-                Create one
-              </button>
-            </div>
-            <button
-              onClick={() => setShowLogin(false)}
-              className="mt-4 text-sm text-gray-400 hover:text-gray-600 block mx-auto"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Signup Modal */}
-      {showSignup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-8 rounded-2xl w-full max-w-md shadow-xl">
-            <h3 className="text-2xl font-semibold mb-6 text-center text-indigo-700">Create Account</h3>
-            <SignupForm onSuccess={() => setShowSignup(false)} />
-            <button
-              onClick={() => setShowSignup(false)}
-              className="mt-4 text-sm text-gray-400 hover:text-gray-600 block mx-auto"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Show DisplayBadges Modal */}
+      {showBadges && <DisplayBadges onClose={() => setShowBadges(false)} />}
     </nav>
   );
 };

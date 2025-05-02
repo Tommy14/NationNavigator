@@ -67,10 +67,11 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       const data = await loginUser(credentials);
       setUser({
+        userId: data.user._id,
         username: data.user.username,
         email: data.user.email
       });
-      localStorage.setItem("user", JSON.stringify({ username: data.user.username, email: data.user.email }));
+      localStorage.setItem("user", JSON.stringify({ userId: data.user._id, username: data.user.username, email: data.user.email }));
   
       // Assuming the token expires in 1 hour — customize as needed
       const expiresAt = Date.now() + 60 * 60 * 1000; // 1 hour
@@ -91,10 +92,11 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       const data = await registerUser(userData);
       setUser({
+        userId: data.user._id,
         username: data.user.username,
         email: data.user.email
       });
-      localStorage.setItem("user", JSON.stringify({ username: data.user.username, email: data.user.email }));
+      localStorage.setItem("user", JSON.stringify({ userId: data.user._id, username: data.user.username, email: data.user.email }));
       return data;
     } catch (err) {
       setError(err.message);

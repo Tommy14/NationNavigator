@@ -63,27 +63,28 @@ export const getMe = async (req, res) => {
     }
   };
 
-  export const addUserBadge = async (req, res) => {
+  export const addBadgeToUser = async (req, res) => {
     try {
-      const { badge } = req.body;
-      const user = await User.findById(req.params.id);
-  
+      const user = await User.findOne({ username: req.params.username });
       if (!user) return res.status(404).json({ message: 'User not found' });
   
+      const { badge } = req.body;
+  
+      // Prevent duplicate badges
       if (!user.badges.includes(badge)) {
         user.badges.push(badge);
         await user.save();
       }
   
-      res.status(200).json({ message: 'Badge added', badges: user.badges });
+      res.status(200).json({ message: 'Badge added successfully', badges: user.badges });
     } catch (err) {
-      res.status(500).json({ message: 'Server error', error: err.message });
+      res.status(500).json({ message: 'Failed to add badge', error: err.message });
     }
   };
   
   export const getUserBadges = async (req, res) => {
     try {
-      const user = await User.findById(req.params.id);
+      const user = await User.findOne({ username: req.params.username });
       if (!user) return res.status(404).json({ message: 'User not found' });
   
       res.status(200).json(user.badges);

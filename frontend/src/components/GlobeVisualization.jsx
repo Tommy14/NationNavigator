@@ -1,11 +1,16 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import Globe from "react-globe.gl";
 import { feature } from "topojson-client";
 
-const GlobeVisualization = ({ viewMode = "realistic", isRotating = true, onCountryClick }) => {
+const GlobeVisualization = ({ viewMode = "realistic", isRotating = true, onCountryClick, filteredCountryNames = [] }) => {
   const [countries, setCountries] = useState({ features: [] });
   const [isLoading, setIsLoading] = useState(true);
   const globeRef = useRef();
+
+  const highlightSet = useMemo(
+    () => new Set(filteredCountryNames),
+    [filteredCountryNames]
+  );
 
   const globeImageUrls = {
     realistic: "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg",
@@ -73,8 +78,14 @@ const GlobeVisualization = ({ viewMode = "realistic", isRotating = true, onCount
           globeImageUrl={globeImageUrls[viewMode]} 
           backgroundImageUrl="//unpkg.com/three-globe/example/img/night-sky.png"
           polygonsData={countries.features}
-          polygonAltitude={0.01}
-          polygonCapColor={(d) => (viewMode === "cartoon" ? d.properties.randomColor : "rgba(200, 200, 200, 0.3)")}
+          polygonAltitude={d => (highlightSet.has(d.properties.name) ? 0.06 : 0.01)}
+          polygonCapColor={d =>
+            highlightSet.has(d.properties.name)
+              ? 'rgba(8, 69, 3,0.8)' // highlight color
+              : (viewMode === "cartoon"
+                  ? d.properties.randomColor
+                  : 'rgba(200, 200, 200, 0.3)')
+          }
           polygonSideColor={() => "rgba(150, 150, 150, 0.2)"}
           polygonStrokeColor={() => "rgba(255, 255, 255, 0.3)"}
           polygonLabel={getPolygonLabel}
