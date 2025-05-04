@@ -93,6 +93,7 @@ export default function AllCountries({ onClose }) {
             <option value="Asia">Asia</option>
             <option value="Europe">Europe</option>
             <option value="Oceania">Oceania</option>
+            <option value="Antarctic">Antarctica</option>
           </select>
         </div>
 

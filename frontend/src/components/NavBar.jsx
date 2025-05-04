@@ -151,6 +151,7 @@ const Navbar = ({ onFilterChange, theme, onToggleTheme, onShowAll }) => {
                 <option value="">Filter by Continent</option>
                 <option value="Africa">Africa</option>
                 <option value="Americas">Americas</option>
+                <option value="Antarctic">Antarctica</option>
                 <option value="Asia">Asia</option>
                 <option value="Europe">Europe</option>
                 <option value="Oceania">Oceania</option>
