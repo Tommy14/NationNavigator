@@ -106,7 +106,7 @@ const Quiz = ({ country, onFinish, onClose }) => {
     try {
         console.log("User:", user);
       if (!user?.username || !country.cca3) return;
-      await axios.post(`https://nation-navigator-pf68.vercel.app/api/users/${user.username}/badges`,
+      await axios.post(`https://nationnavigator.onrender.com/api/users/${user.username}/badges`,
         { badge: country.cca3 },
         {
           headers: {

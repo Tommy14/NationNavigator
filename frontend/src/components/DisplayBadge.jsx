@@ -11,8 +11,7 @@ const DisplayBadges = ({ onClose }) => {
     const fetchBadges = async () => {
       try {
         const token = localStorage.getItem('accessToken'); // Retrieve the token from localStorage
-        const response = await axios.get(
-          `https://nation-navigator-pf68.vercel.app/api/users/${user?.username}/badges`,
+        const response = await axios.get(`https://nationnavigator.onrender.com/api/users/${user?.username}/badges`,
           {
             withCredentials: true,
             headers: {
