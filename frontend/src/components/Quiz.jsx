@@ -28,9 +28,20 @@ const generateQuestions = async (country) => {
   }
 
   if (country.population) {
-    const pops = shuffle(others.map(c => c.population).filter(Boolean))
-      .slice(0, 3)
-      .map(p => formatPopulation(p));
+    const rawPops = others
+      .map(c => c.population)
+      .filter(p => Math.round(p / 1000000) >= 1);
+    const wrongPops = shuffle(rawPops).slice(0, 3).map(p => formatPopulation(p));
+    const pops =
+      wrongPops.length === 3
+        ? wrongPops
+        : Array(3)
+            .fill()
+            .map(() =>
+              formatPopulation(
+                Math.round(country.population * (1 + (Math.random() * 0.4 - 0.2)))
+              )
+            );
     questions.push({
       question: `What is the approximate population of ${country.name.common}?`,
       options: shuffle([formatPopulation(country.population), ...pops]),
