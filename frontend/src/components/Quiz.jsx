@@ -4,82 +4,68 @@ import { useAuth } from '../context/AuthContext';
 
 const generateQuestions = async (country) => {
   const questions = [];
+  const { data: allCountries } = await axios.get('https://restcountries.com/v3.1/all');
+  const others = allCountries.filter(c => c.name.common !== country.name.common);
 
   if (country.capital?.[0]) {
+    const capitals = others.map(c => c.capital?.[0]).filter(Boolean);
+    const wrongCaps = shuffle(capitals).slice(0, 3);
     questions.push({
       question: `What is the capital of ${country.name.common}?`,
-      options: shuffle([
-        country.capital[0],
-        "Paris",
-        "Tokyo",
-        "Ottawa"
-      ]),
+      options: shuffle([country.capital[0], ...wrongCaps]),
       correct: country.capital[0],
     });
   }
 
   if (country.region) {
+    const regions = Array.from(new Set(others.map(c => c.region).filter(Boolean)));
+    const wrongRegs = shuffle(regions.filter(r => r !== country.region)).slice(0, 3);
     questions.push({
       question: `Which region does ${country.name.common} belong to?`,
-      options: shuffle([
-        country.region,
-        "Europe",
-        "Oceania",
-        "Africa"
-      ]),
+      options: shuffle([country.region, ...wrongRegs]),
       correct: country.region,
     });
   }
 
   if (country.population) {
+    const pops = shuffle(others.map(c => c.population).filter(Boolean))
+      .slice(0, 3)
+      .map(p => formatPopulation(p));
     questions.push({
       question: `What is the approximate population of ${country.name.common}?`,
-      options: shuffle([
-        formatPopulation(country.population),
-        formatPopulation(country.population + 1000000),
-        formatPopulation(country.population - 1000000),
-        formatPopulation(country.population + 5000000)
-      ]),
+      options: shuffle([formatPopulation(country.population), ...pops]),
       correct: formatPopulation(country.population),
     });
   }
 
   if (country.currencies) {
-    const currency = Object.values(country.currencies)[0]?.name;
-    if (currency) {
-      questions.push({
-        question: `What is the currency of ${country.name.common}?`,
-        options: shuffle([
-          currency,
-          "Dollar",
-          "Euro",
-          "Yen"
-        ]),
-        correct: currency,
-      });
-    }
+    const currNames = Array.from(new Set(
+      others.flatMap(c =>
+        c.currencies ? Object.values(c.currencies).map(cur => cur.name) : []
+      )
+    ));
+    const wrongCurr = shuffle(currNames.filter(name => name !== Object.values(country.currencies)[0].name)).slice(0, 3);
+    const correctCurr = Object.values(country.currencies)[0].name;
+    questions.push({
+      question: `What is the currency of ${country.name.common}?`,
+      options: shuffle([correctCurr, ...wrongCurr]),
+      correct: correctCurr,
+    });
   }
 
   if (country.flags?.svg) {
-    const allCountries = await axios.get('https://restcountries.com/v3.1/all');
-    const otherFlags = allCountries.data
-      .filter(c => c.name.common !== country.name.common && c.flags?.svg)
-      .sort(() => 0.5 - Math.random())
-      .slice(0, 3)
-      .map(c => ({
-        label: c.name.common,
-        image: c.flags.svg
-      }));
-
+    const otherFlags = shuffle(
+      others.filter(c => c.flags?.svg)
+        .map(c => ({ label: c.name.common, image: c.flags.svg }))
+    ).slice(0, 3);
     const options = shuffle([
       { label: country.name.common, image: country.flags.svg },
       ...otherFlags
     ]);
-
     questions.push({
       question: `Which of the following is the flag of ${country.name.common}?`,
       imageOptions: options,
-      correct: country.name.common
+      correct: country.name.common,
     });
   }
 
@@ -109,7 +95,7 @@ const Quiz = ({ country, onFinish, onClose }) => {
     try {
         console.log("User:", user);
       if (!user?.username || !country.cca3) return;
-      await axios.post(`https://nationnavigator.onrender.com/api/users/${user.username}/badges`, // or user.id
+      await axios.post(`http://localhost:9000/api/users/${user.username}/badges`,
         { badge: country.cca3 },
         {
           headers: {
@@ -136,11 +122,10 @@ const Quiz = ({ country, onFinish, onClose }) => {
   const current = questions[currentIndex];
 
   const handleOptionSelect = (option) => {
-    if (selectedOption) return; // Prevent multiple selections
+    if (selectedOption) return;
     setSelectedOption(option);
     setShowFeedback(true);
 
-    // Store selected option for progress indicator
     const updated = [...questions];
     updated[currentIndex] = { ...updated[currentIndex], selected: option };
     setQuestions(updated);
@@ -175,21 +160,21 @@ const Quiz = ({ country, onFinish, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="p-6 bg-white dark:bg-gray-800 text-black dark:text-white shadow-lg rounded-xl max-w-xl w-full relative flex">
+      <div className="p-6 bg-white/30 backdrop-blur-md border border-white/10 shadow-md text-black dark:text-white shadow-lg rounded-xl max-w-xl w-full relative flex">
         <div className="flex-1 flex flex-col">
           <button
             onClick={onClose}
-            className="absolute top-2 right-2 text-gray-500 hover:text-black text-sm"
+            className="absolute top-2 right-2 text-white hover:text-black text-sm"
           >
             ✖
           </button>
 
           {showResult ? (
-            <div className="text-center">
+            <div className="text-center p-6 rounded-xl">
               {score === questions.length ? (
-                <div className="text-center animate-bounce">
+                <div className="text-center">
                   <img src={country.flags.svg} alt="Badge" className="w-24 h-16 mx-auto mb-2" />
-                  <h2 className="text-xl font-bold text-green-600">🏆 You earned the country flag as a badge!</h2>
+                  <h2 className="text-3xl font-extrabold text-white drop-shadow-lg mb-2">You earned the country flag as a badge!</h2>
                 </div>
               ) : (
                 <>
@@ -257,7 +242,7 @@ const Quiz = ({ country, onFinish, onClose }) => {
                                 : isWrong
                                 ? 'bg-red-100 border-red-500 text-red-800'
                                 : 'opacity-70'
-                              : 'hover:bg-gray-100'
+                              : 'hover:bg-black'
                           }`}
                         >
                           {option}
@@ -270,9 +255,7 @@ const Quiz = ({ country, onFinish, onClose }) => {
             </>
           )}
         </div>
-        {/* Right-side vertical progress and stats */}
         <div className="w-6 flex flex-col items-center justify-center ml-4 space-y-1">
-          {/* Progress indicator for each question */}
           {questions.map((q, idx) => {
             const isAnswered = typeof q.selected !== 'undefined';
             const isCorrect = isAnswered && q.selected === q.correct;
@@ -285,9 +268,7 @@ const Quiz = ({ country, onFinish, onClose }) => {
               ></div>
             );
           })}
-          {/* Spacer */}
           <div className="h-4"></div>
-          {/* Stats: current question progress only */}
           <div className="text-xs text-gray-700 text-center">
           </div>
         </div>

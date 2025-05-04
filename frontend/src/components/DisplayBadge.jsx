@@ -12,7 +12,7 @@ const DisplayBadges = ({ onClose }) => {
       try {
         const token = localStorage.getItem('accessToken'); // Retrieve the token from localStorage
         const response = await axios.get(
-          `https://nationnavigator.onrender.com/api/users/${user?.username}/badges`,
+          `http://localhost:9000/api/users/${user?.username}/badges`,
           {
             withCredentials: true,
             headers: {
@@ -47,18 +47,18 @@ const DisplayBadges = ({ onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-xl w-full max-w-lg shadow-lg relative">
+      <div className="bg-white/30 backdrop-blur-md border border-white/10 shadow-md  p-6 rounded-xl w-full max-w-lg shadow-lg relative">
         <button
           onClick={onClose}
-          className="absolute top-2 right-3 text-gray-500 hover:text-black"
+          className="absolute top-2 right-3 text-white hover:text-black"
         >
           ✖
         </button>
-        <h2 className="text-2xl font-bold text-center mb-4 text-black">Your Country Badges</h2> {/* Ensure visible text color */}
+        <h2 className="text-2xl font-bold text-center mb-4 text-white">Your Country Badges</h2> {/* Ensure visible text color */}
         {loading ? (
           <p className="text-center">Loading badges...</p>
         ) : badges.length === 0 ? (
-          <p className="text-center text-gray-500">No badges earned yet.</p>
+          <p className="text-center text-white">No badges earned yet.</p>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {badges.map((badge) => (

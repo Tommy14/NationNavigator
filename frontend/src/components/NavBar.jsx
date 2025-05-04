@@ -100,7 +100,7 @@ const Navbar = ({ onFilterChange, theme, onToggleTheme, onShowAll }) => {
         {/* Mobile menu toggle */}
         <button
           onClick={() => setMenuOpen(o => !o)}
-          className="md:hidden ml-4 p-2 text-xl"
+          className="md:hidden ml-96 p-2 text-xl"
         >
           {menuOpen ? '✕' : '☰'}
         </button>
@@ -110,7 +110,7 @@ const Navbar = ({ onFilterChange, theme, onToggleTheme, onShowAll }) => {
           <button
             onClick={() => setShowFilter(f => !f)}
             className={
-              `ml-4 p-1 md:p-2 rounded transition ` +
+              `hidden md:inline-block ml-4 p-1 md:p-2 rounded transition ` +
               (theme === 'dark'
                 ? 'bg-white hover:bg-gray-200 text-black'
                 : 'bg-indigo-600 hover:bg-indigo-500 text-white')
@@ -123,7 +123,7 @@ const Navbar = ({ onFilterChange, theme, onToggleTheme, onShowAll }) => {
           <button
             onClick={onToggleTheme}
             className={
-              `ml-4 p-1 md:p-2 rounded transition ` +
+              `ml-2 p-1 md:p-2 rounded transition ` +
               (theme === 'dark'
                 ? 'text-white hover:bg-opacity-20'
                 : 'text-indigo-600 ring-2 ring-indigo-500 hover:ring-indigo-400')

@@ -7,6 +7,8 @@ import { FiX } from 'react-icons/fi';
 export default function AllCountries({ onClose }) {
   const [countries, setCountries] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [continentFilter, setContinentFilter] = useState('');
   const [loading, setLoading] = useState(true);
 
   // Close modal on Escape key
@@ -56,21 +58,52 @@ export default function AllCountries({ onClose }) {
   }
 
   // Main modal
+  // Filtered countries
+  const filtered = countries
+    .filter(c =>
+      c.name.common.toLowerCase().includes(searchQuery.toLowerCase())
+      && (continentFilter === '' || c.region === continentFilter)
+    );
   return (
       <div
-        className="relative bg-gray-900 bg-opacity-80 backdrop-blur-xl rounded-lg text-white w-11/12 max-w-4xl mx-auto p-6 max-h-[80vh] overflow-y-auto"
+        className="relative bg-gray-900 bg-opacity-60 backdrop-blur-xl rounded-lg text-white w-11/12 max-w-4xl mx-auto p-6 max-h-[80vh] overflow-y-auto"
         onClick={e => e.stopPropagation()}
       >
 
         {/* Title */}
         <h2 className="text-2xl font-bold mb-4 text-center">All Countries</h2>
 
+        {/* Filter bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 space-y-2 sm:space-y-0">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            placeholder="Search countries"
+            className="px-4 py-2 rounded-md bg-gray-800 text-white w-full sm:w-1/2 focus:outline-none"
+          />
+          <select
+            value={continentFilter}
+            onChange={e => setContinentFilter(e.target.value)}
+            className="px-4 py-2 rounded-md bg-gray-800 text-white w-full sm:w-1/4 focus:outline-none"
+          >
+            <option value="">All Continents</option>
+            <option value="Africa">Africa</option>
+            <option value="Americas">Americas</option>
+            <option value="Asia">Asia</option>
+            <option value="Europe">Europe</option>
+            <option value="Oceania">Oceania</option>
+          </select>
+        </div>
+
+        
+
         {/* Flag grid with scroll */}
         <div
           className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-6 overflow-y-auto"
           style={{ maxHeight: '60vh' }}
         >
-          {countries.map(c => (
+          {filtered.map(c => (
             <div
               key={c.cca3}
               className="cursor-pointer text-center hover:shadow-xl rounded-lg overflow-hidden transition"

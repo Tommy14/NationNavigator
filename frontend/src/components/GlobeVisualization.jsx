@@ -27,11 +27,9 @@ const GlobeVisualization = ({
 
   const backgroundImageUrls = {
     dark: "//unpkg.com/three-globe/example/img/night-sky.png",
-    // Using a light sky-like PNG from the same CDN
     light: "https://unpkg.com/three-globe/example/img/earth-dark.jpg",
   };
 
-  // Load country data
   useEffect(() => {
     setIsLoading(true);
     fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
@@ -50,7 +48,6 @@ const GlobeVisualization = ({
       });
   }, []);
 
-  // Handle rotation based on isRotating prop
   useEffect(() => {
     if (!globeRef.current) return;
     const controls = globeRef.current.controls();
