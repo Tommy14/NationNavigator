@@ -12,7 +12,7 @@ const DisplayBadges = ({ onClose }) => {
       try {
         const token = localStorage.getItem('accessToken'); // Retrieve the token from localStorage
         const response = await axios.get(
-          `http://localhost:9000/api/users/${user?.username}/badges`,
+          `https://nation-navigator-pf68.vercel.app/api/users/${user?.username}/badges`,
           {
             withCredentials: true,
             headers: {
