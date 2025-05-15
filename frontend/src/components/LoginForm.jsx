@@ -4,24 +4,21 @@ import { useAuth } from '../context/AuthContext';
 import Input from './ui/Input';
 import Button from './ui/Button';
 import Alert from './ui/Alert';
-import { motion } from 'framer-motion';
-import { FiUser } from 'react-icons/fi';
-
-
-const LoginForm = ({ onSuccess }) => {
+ 
+const LoginForm = ({ onSuccess, theme }) => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [formErrors, setFormErrors] = useState({});
   const [submitError, setSubmitError] = useState('');
   const { login, loading } = useAuth();
   const navigate = useNavigate();
-
+ 
   const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData(prev => ({ ...prev, [id]: value }));
     if (formErrors[id]) setFormErrors(prev => ({ ...prev, [id]: '' }));
     if (submitError) setSubmitError('');
   };
-
+ 
   const validateForm = () => {
     const errors = {};
     if (!formData.email.trim()) errors.email = 'Email is required';
@@ -30,25 +27,21 @@ const LoginForm = ({ onSuccess }) => {
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
-
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
     try {
-        await login(formData);
-        onSuccess?.(); // closes modal
-        
-        // 👇 navigate only AFTER a short delay to ensure modal unmounts
-        setTimeout(() => {
-            navigate('/');
-        }, 100);
+      await login(formData);
+      onSuccess?.(); // Close modal
+      setTimeout(() => navigate('/'), 100); // Smooth redirect
     } catch (error) {
       setSubmitError(error.message || 'Failed to login. Please try again.');
     }
   };
-
+ 
   return (
-    <form className="space-y-6" onSubmit={handleSubmit}>
+    <form className={`space-y-6 ${theme === "dark" ? "text-indigo-100" : "text-indigo-900"}`} onSubmit={handleSubmit}>
       {submitError && <Alert type="error" message={submitError} onClose={() => setSubmitError('')} />}
       <Input
         id="email"
@@ -59,6 +52,7 @@ const LoginForm = ({ onSuccess }) => {
         error={formErrors.email}
         required
         autoComplete="email"
+        theme={theme}
       />
       <Input
         id="password"
@@ -69,6 +63,7 @@ const LoginForm = ({ onSuccess }) => {
         error={formErrors.password}
         required
         autoComplete="current-password"
+        theme={theme}
       />
       <Button type="submit" variant="primary" fullWidth isLoading={loading}>
         Sign in
@@ -76,5 +71,5 @@ const LoginForm = ({ onSuccess }) => {
     </form>
   );
 };
-
+ 
 export default LoginForm;

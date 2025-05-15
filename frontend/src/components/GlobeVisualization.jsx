@@ -22,12 +22,12 @@ const GlobeVisualization = ({
     realistic: "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg",
     night: "//unpkg.com/three-globe/example/img/earth-night.jpg",
     topo: "//unpkg.com/three-globe/example/img/earth-topology.png",
-    cartoon: "https://unpkg.com/three-globe/example/img/earth-dark.jpg",
+    cartoon: "././assets/earth-light.png",
   };
 
   const backgroundImageUrls = {
     dark: "//unpkg.com/three-globe/example/img/night-sky.png",
-    light: "https://unpkg.com/three-globe/example/img/earth-dark.jpg",
+    light: "",
   };
 
   useEffect(() => {

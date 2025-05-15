@@ -69,6 +69,7 @@ export default function Home() {
           <CountryDetails
             country={selectedCountry}
             onClose={() => setSelectedCountry(null)}
+            theme={theme}
           />
         </div>
       )}

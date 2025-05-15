@@ -5,8 +5,8 @@ import Input from './ui/Input';
 import Button from './ui/Button';
 import Alert from './ui/Alert';
 import PasswordStrengthIndicator from './ui/PasswordStrengthIndicator';
-
-const SignUpForm = ({ onSuccess }) => {
+ 
+const SignUpForm = ({ onSuccess, theme }) => {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -17,14 +17,14 @@ const SignUpForm = ({ onSuccess }) => {
   const [submitError, setSubmitError] = useState('');
   const { register, loading } = useAuth();
   const navigate = useNavigate();
-
+ 
   const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData(prev => ({ ...prev, [id]: value }));
     if (formErrors[id]) setFormErrors(prev => ({ ...prev, [id]: '' }));
     if (submitError) setSubmitError('');
   };
-
+ 
   const validateForm = () => {
     const errors = {};
     if (!formData.username.trim()) errors.username = 'Username is required';
@@ -35,7 +35,7 @@ const SignUpForm = ({ onSuccess }) => {
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
-
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -45,15 +45,15 @@ const SignUpForm = ({ onSuccess }) => {
         email: formData.email,
         password: formData.password,
       });
-      onSuccess?.(); // Optional callback (e.g., close modal)
+      onSuccess?.();
       navigate('/');
     } catch (error) {
       setSubmitError(error.message || 'Failed to register. Please try again.');
     }
   };
-
+ 
   return (
-    <form className="space-y-6" onSubmit={handleSubmit}>
+    <form className={`space-y-6 ${theme === "dark" ? "text-indigo-100" : "text-indigo-900"}`} onSubmit={handleSubmit}>
       {submitError && <Alert type="error" message={submitError} onClose={() => setSubmitError('')} />}
       <Input
         id="username"
@@ -64,6 +64,7 @@ const SignUpForm = ({ onSuccess }) => {
         error={formErrors.username}
         required
         autoComplete="username"
+        theme={theme}
       />
       <Input
         id="email"
@@ -74,6 +75,7 @@ const SignUpForm = ({ onSuccess }) => {
         error={formErrors.email}
         required
         autoComplete="email"
+        theme={theme}
       />
       <Input
         id="password"
@@ -84,9 +86,9 @@ const SignUpForm = ({ onSuccess }) => {
         error={formErrors.password}
         required
         autoComplete="new-password"
+        theme={theme}
       />
-      {formData.password && <PasswordStrengthIndicator password={formData.password} />}
-      <Input
+      {formData.password && <PasswordStrengthIndicator password={formData.password} theme={theme} />}      <Input
         id="confirmPassword"
         type="password"
         label="Confirm Password"
@@ -95,6 +97,7 @@ const SignUpForm = ({ onSuccess }) => {
         error={formErrors.confirmPassword}
         required
         autoComplete="new-password"
+        theme={theme}
       />
       <Button type="submit" variant="primary" fullWidth isLoading={loading}>
         Create Account
@@ -102,5 +105,5 @@ const SignUpForm = ({ onSuccess }) => {
     </form>
   );
 };
-
+ 
 export default SignUpForm;
