@@ -118,16 +118,20 @@ const Navbar = ({ onFilterChange, theme, onToggleTheme, onShowAll }) => {
         {/* Mobile menu toggle */}
         <button
           onClick={() => setMenuOpen((o) => !o)}
-          className="md:hidden ml-96 p-2 text-xl"
+          className="md:hidden ml-auto p-1 text-xl"
         >
           {menuOpen ? "✕" : "☰"}
         </button>
         {/* Nav items */}
         <div
-          className={`${
-            menuOpen ? "flex" : "hidden"
-          } flex-col md:flex md:flex-row md:items-center w-full md:w-auto md:space-x-4 space-y-2 md:space-y-0 px-4 md:px-0 md:ml-auto`}
-        >
+        className={`${
+          menuOpen ? "flex" : "hidden"
+        } flex-col md:flex md:flex-row md:items-center w-full md:w-auto md:space-x-4 space-y-2 md:space-y-0 px-4 md:px-0 md:ml-auto z-50 absolute top-full left-0 md:static ${
+          theme === "dark"
+            ? "bg-[#0f172a] md:bg-transparent"
+            : "bg-white md:bg-transparent"
+        }`}
+      >
           {/* Filter toggle */}
           <button
             onClick={() => setShowFilter((f) => !f)}
@@ -146,7 +150,7 @@ const Navbar = ({ onFilterChange, theme, onToggleTheme, onShowAll }) => {
           <button
             onClick={onToggleTheme}
             className={
-              `ml-2 p-1 md:p-2 rounded-full transition ` +
+              `px-10 ml-72 p-1 md:p-2 rounded-full transition ` +
               (theme === "dark"
                 ? "bg-indigo-900/50 hover:bg-indigo-800 text-indigo-200 border border-indigo-700/70 shadow-[0_0_8px_rgba(99,102,241,0.2)]"
                 : "bg-indigo-100 hover:bg-indigo-200 text-indigo-600 border border-indigo-200")
@@ -276,7 +280,7 @@ const Navbar = ({ onFilterChange, theme, onToggleTheme, onShowAll }) => {
                 setDropdownOpen(false);
               }}
               className={
-                `flex items-center px-5 py-2 rounded-md font-semibold transition md:mr-4 shadow-lg ` +
+                `px-10 ml-72 p-1 md:p-2 rounded-full transition ` +
                 (theme === "dark"
                   ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-[0_0_10px_rgba(99,102,241,0.4)]"
                   : "bg-indigo-600 hover:bg-indigo-700 text-white")
@@ -440,7 +444,7 @@ const Navbar = ({ onFilterChange, theme, onToggleTheme, onShowAll }) => {
       {showList && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div
-            className={`rounded-lg shadow-lg w-full max-w-4xl h-full max-h-[90vh] overflow-auto ${
+            className={`rounded-lg shadow-lg w-full max-w-4xl bg-opacity-50 h-full max-h-[90vh] overflow-auto ${
               theme === "dark" ? "bg-[#0b1120]" : "bg-[#f8fafc]"
             }`}
           >
