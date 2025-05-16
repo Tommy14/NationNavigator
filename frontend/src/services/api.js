@@ -5,7 +5,7 @@ let isRefreshing = false;
 let refreshSubscribers = [];
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:9000',
+  baseURL: 'https://nationnavigator.onrender.com' || 'http://localhost:9000',
   withCredentials: true
 });
 
@@ -48,7 +48,7 @@ api.interceptors.response.use(
     try {
       // Attempt to refresh token
       const { data } = await axios.get('/api/auth/refresh-token', {
-        baseURL: import.meta.env.VITE_API_URL || 'http://localhost:9000',
+        baseURL: 'https://nationnavigator.onrender.com' || 'http://localhost:9000',
         withCredentials: true
       });
       
