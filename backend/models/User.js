@@ -5,7 +5,11 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   badges: {
-    type: [String], // Array of CCA3 codes (e.g., ['JPN', 'USA'])
+    type: [String],
+    default: []
+  },
+  favourite: {
+    type: [String],
     default: []
   }
 });

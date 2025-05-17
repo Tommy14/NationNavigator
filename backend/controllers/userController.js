@@ -92,3 +92,72 @@ export const getMe = async (req, res) => {
       res.status(500).json({ message: 'Server error', error: err.message });
     }
   };
+
+export const addToFavourites = async (req, res) => {
+  try {
+    const { countryName, countryCode } = req.body;
+    const userId = req.user.id; // Get user ID from JWT token
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    // Prevent duplicate countries
+    if (!user.favourite.includes(countryCode)) {
+      user.favourite.push(countryCode);
+      await user.save();
+    }
+
+    res.status(200).json({ message: 'Country added to favourites', favourites: user.favourite });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to add to favourites', error: err.message });
+  }
+}
+
+//show favourites
+export const getFavourites = async (req, res) => {
+  try {
+    const userId = req.user.id; // Get user ID from JWT token
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    res.status(200).json(user.favourite);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+}
+
+export const removeFromFavourites = async (req, res) => {
+  try {
+    const { countryCode } = req.params; // get from URL params
+    const userId = req.user.id; // Get user ID from JWT token
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    // Remove country from favourites
+    user.favourite = user.favourite.filter(code => code !== countryCode);
+    await user.save();
+
+    res.status(200).json({ message: 'Country removed from favourites', favourites: user.favourite });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to remove from favourites', error: err.message });
+  }
+};
+
+//check if a country is a favourite
+export const checkIfFavourite = async (req, res) => {
+  try {
+    const { countryCode } = req.params;
+    const userId = req.user.id; // Get user ID from JWT token
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const isFavourite = user.favourite.includes(countryCode);
+
+    res.status(200).json({ isFavourite });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+}

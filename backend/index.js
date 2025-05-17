@@ -10,7 +10,8 @@ const app = express();
 
 // ✅ Apply proper CORS config BEFORE your routes
 const allowedOrigins = [
-  'https://nation-navigator-pf68.vercel.app'
+  'http://localhost:5173',
+  'https://nation-navigator-pf68.vercel.app',
 ];
 
 app.use(cors({
