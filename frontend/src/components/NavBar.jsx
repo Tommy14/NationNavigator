@@ -128,17 +128,13 @@ const Navbar = ({ onFilterChange, theme, onToggleTheme, onShowAll }) => {
         <div
         className={`${
           menuOpen ? "flex" : "hidden"
-        } flex-col md:flex md:flex-row md:items-center w-full md:w-auto md:space-x-4 space-y-2 md:space-y-0 px-4 md:px-0 md:ml-auto z-50 absolute top-full left-0 md:static ${
-          theme === "dark"
-            ? "bg-[#0f172a] md:bg-transparent"
-            : "bg-white md:bg-transparent"
-        }`}
+        } flex-col md:flex md:flex-row md:items-center w-full md:w-auto md:space-x-4 space-y-2 md:space-y-0 px-4 md:px-0 md:ml-auto z-50 absolute top-full left-0 md:static md:bg-transparent bg-transparent`}
       >
           {/* Filter toggle */}
           <button
             onClick={() => setShowFilter((f) => !f)}
             className={
-              `hidden md:inline-block ml-4 p-1 md:p-2 rounded-full transition ` +
+              `hidden md:inline-block ml-auto p-1 md:p-2 rounded-full transition ` +
               (theme === "dark"
                 ? "bg-indigo-900/50 hover:bg-indigo-800 text-indigo-200 border border-indigo-700/70 shadow-[0_0_8px_rgba(99,102,241,0.2)]"
                 : "bg-indigo-500 hover:bg-indigo-600 text-white")
@@ -152,7 +148,7 @@ const Navbar = ({ onFilterChange, theme, onToggleTheme, onShowAll }) => {
           <button
             onClick={onToggleTheme}
             className={
-              `px-10 ml-72 p-1 md:p-2 rounded-full transition ` +
+              `px-5 ml-auto p-1 md:p-2 rounded-full transition ` +
               (theme === "dark"
                 ? "bg-indigo-900/50 hover:bg-indigo-800 text-indigo-200 border border-indigo-700/70 shadow-[0_0_8px_rgba(99,102,241,0.2)]"
                 : "bg-indigo-100 hover:bg-indigo-200 text-indigo-600 border border-indigo-200")
@@ -223,7 +219,7 @@ const Navbar = ({ onFilterChange, theme, onToggleTheme, onShowAll }) => {
  
           {/* Login / Sign Up Button */}
           {user ? (
-            <div className="relative flex items-center md:mr-8 z-50">
+            <div className="relative flex items-center md:mr-8 z-50 ml-auto">
               <button
                 onClick={() => setDropdownOpen((prev) => !prev)}
                 className={
@@ -233,7 +229,7 @@ const Navbar = ({ onFilterChange, theme, onToggleTheme, onShowAll }) => {
                     : "bg-indigo-600 hover:bg-indigo-700 text-white")
                 }
               >
-                <FiUser size={20} className="md:hidden" />
+              <FiUser size={20} className="md:hidden ml-auto" />
                 <span className="hidden md:inline">Hi, {user.username}</span>
               </button>
               {dropdownOpen && (
