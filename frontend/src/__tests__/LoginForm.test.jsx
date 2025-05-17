@@ -3,14 +3,12 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import LoginForm from '../components/LoginForm';
 
-// Mock the AuthContext
 jest.mock('../context/AuthContext', () => ({
   useAuth: jest.fn(),
 }));
 
 import { useAuth } from '../context/AuthContext';
 
-// Helper to wrap component in <BrowserRouter>
 const renderWithRouter = (ui) => {
   return render(<BrowserRouter>{ui}</BrowserRouter>);
 };
@@ -31,7 +29,6 @@ describe('LoginForm', () => {
     });
     fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
 
-    // You can add more expectations here if your form does something specific
   });
 
   test('shows error on empty fields', async () => {
@@ -43,8 +40,7 @@ describe('LoginForm', () => {
     renderWithRouter(<LoginForm />);
     fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
 
-    // If your form has validations that render messages like "email is required"
-    // Make sure your LoginForm component shows these errors!
+
     await waitFor(() => {
       expect(screen.getByText(/email is required/i)).toBeInTheDocument();
       expect(screen.getByText(/password is required/i)).toBeInTheDocument();

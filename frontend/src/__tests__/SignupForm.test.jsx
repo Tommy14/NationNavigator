@@ -5,7 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 
 jest.mock('../context/AuthContext', () => ({
     useAuth: () => ({
-      register: jest.fn(() => Promise.resolve()), // mock register function
+      register: jest.fn(() => Promise.resolve()), 
       loading: false
     })
   }));
@@ -13,6 +13,46 @@ jest.mock('../context/AuthContext', () => ({
 const renderWithRouter = (ui) => {
   return render(<BrowserRouter>{ui}</BrowserRouter>);
 };
+
+test('renders and submits signup form', async () => {
+  renderWithRouter(<SignupForm />);
+
+  fireEvent.change(screen.getByLabelText(/username/i), {
+    target: { value: 'testuser' },
+  });
+  fireEvent.change(screen.getByLabelText(/email/i), {
+    target: { value: 'test@example.com' },
+  });
+  fireEvent.change(screen.getByLabelText(/^password$/i), {
+    target: { value: 'abc123' },
+  });
+  fireEvent.change(screen.getByLabelText(/confirm password/i), {
+    target: { value: 'abc123' },
+  });
+
+  fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+
+  await waitFor(() => {
+    expect(screen.getByText(/create account/i)).toBeInTheDocument();
+  });
+});
+
+test('shows error on password mismatch', async () => {
+  renderWithRouter(<SignupForm />);
+
+  fireEvent.change(screen.getByLabelText(/^password$/i), {
+    target: { value: 'abc123' },
+  });
+  fireEvent.change(screen.getByLabelText(/confirm password/i), {
+    target: { value: 'wrongpass' },
+  });
+
+  fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+
+  await waitFor(() => {
+    expect(screen.getByText(/passwords do not match/i)).toBeInTheDocument();
+  });
+});
 
 test('renders and submits signup form', async () => {
   renderWithRouter(<SignupForm />);
@@ -55,4 +95,83 @@ test('shows error on password mismatch', async () => {
   });
 });
 
+test('renders and submits signup form', async () => {
+  renderWithRouter(<SignupForm />);
 
+  fireEvent.change(screen.getByLabelText(/username/i), {
+    target: { value: 'testuser' },
+  });
+  fireEvent.change(screen.getByLabelText(/email/i), {
+    target: { value: 'test@example.com' },
+  });
+  fireEvent.change(screen.getByLabelText(/^password$/i), {
+    target: { value: 'abc123' },
+  });
+  fireEvent.change(screen.getByLabelText(/confirm password/i), {
+    target: { value: 'abc123' },
+  });
+
+  fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+
+  // expect navigation or API to be called, or show success msg
+  await waitFor(() => {
+    expect(screen.getByText(/create account/i)).toBeInTheDocument();
+  });
+});
+
+test('shows error on password mismatch', async () => {
+  renderWithRouter(<SignupForm />);
+
+  fireEvent.change(screen.getByLabelText(/^password$/i), {
+    target: { value: 'abc123' },
+  });
+  fireEvent.change(screen.getByLabelText(/confirm password/i), {
+    target: { value: 'wrongpass' },
+  });
+
+  fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+
+  await waitFor(() => {
+    expect(screen.getByText(/passwords do not match/i)).toBeInTheDocument();
+  });
+});
+
+test('renders and submits signup form', async () => {
+  renderWithRouter(<SignupForm />);
+
+  fireEvent.change(screen.getByLabelText(/username/i), {
+    target: { value: 'testuser' },
+  });
+  fireEvent.change(screen.getByLabelText(/email/i), {
+    target: { value: 'test@example.com' },
+  });
+  fireEvent.change(screen.getByLabelText(/^password$/i), {
+    target: { value: 'abc123' },
+  });
+  fireEvent.change(screen.getByLabelText(/confirm password/i), {
+    target: { value: 'abc123' },
+  });
+
+  fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+
+  await waitFor(() => {
+    expect(screen.getByText(/create account/i)).toBeInTheDocument();
+  });
+});
+
+test('shows error on password mismatch', async () => {
+  renderWithRouter(<SignupForm />);
+
+  fireEvent.change(screen.getByLabelText(/^password$/i), {
+    target: { value: 'abc123' },
+  });
+  fireEvent.change(screen.getByLabelText(/confirm password/i), {
+    target: { value: 'wrongpass' },
+  });
+
+  fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+
+  await waitFor(() => {
+    expect(screen.getByText(/passwords do not match/i)).toBeInTheDocument();
+  });
+});

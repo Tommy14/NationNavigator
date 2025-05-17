@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import DisplayBadges from './DisplayBadge';
 import DisplayFavourites from './DisplayFav';
@@ -53,8 +52,18 @@ const Navbar = ({ onFilterChange, theme, onToggleTheme, onShowAll }) => {
       try {
         let url = "";
         if (searchQuery) {
-          // Search by name
+          // Try searching by name first
           url = `https://restcountries.com/v3.1/name/${searchQuery}`;
+        
+          try {
+            const response = await axios.get(url);
+            setCountries(response.data);
+            onFilterChange(response.data.map((c) => c.name.common));
+            return; // Exit if name search succeeded
+          } catch (err) {
+            // If name search fails, try capital
+            url = `https://restcountries.com/v3.1/capital/${searchQuery}`;
+          }
         } else if (continentFilter) {
           // Filter by region
           url = `https://restcountries.com/v3.1/region/${continentFilter}`;

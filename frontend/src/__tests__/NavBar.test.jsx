@@ -19,3 +19,17 @@ test('renders NavBar with logo and menu toggle', () => {
   expect(logo).toBeInTheDocument();
   expect(menuToggle).toBeInTheDocument();
 });
+
+test('render the all countries', () => {
+  render(
+    <AuthProvider>
+      <NavBar onFilterChange={jest.fn()} />
+    </AuthProvider>
+  );
+
+  const logo = screen.getByAltText(/NationNavigator Logo/i);
+  const menuToggle = screen.getByLabelText(/Show All Countries/i);
+
+  expect(logo).toBeInTheDocument();
+  expect(menuToggle).toBeInTheDocument();
+});

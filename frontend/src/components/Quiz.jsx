@@ -170,8 +170,8 @@ const Quiz = ({ country, onFinish, onClose }) => {
   if (loading || !country || questions.length === 0) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="p-6 bg-white/30 backdrop-blur-md border border-white/10 shadow-md text-black dark:text-white shadow-lg rounded-xl max-w-xl w-full relative flex">
+    <div className="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="p-6 bg-white/30 backdrop-blur-md border border-white/10 shadow-md text-white dark:text-white shadow-lg rounded-xl max-w-xl w-full relative flex">
         <div className="flex-1 flex flex-col">
           <button
             onClick={onClose}
@@ -253,7 +253,7 @@ const Quiz = ({ country, onFinish, onClose }) => {
                                 : isWrong
                                 ? 'bg-red-100 border-red-500 text-red-800'
                                 : 'opacity-70'
-                              : 'hover:bg-black'
+                              : 'hover:bg-blue-800'
                           }`}
                         >
                           {option}
