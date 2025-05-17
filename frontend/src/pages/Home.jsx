@@ -35,7 +35,7 @@ export default function Home() {
       if (countryData) {
         setSelectedCountry(countryData); // 💡 store in state
       }
-      console.log("COuntry data:", countryData);
+      console.log("Country data:", countryData);
     } catch (err) {
       console.error("Failed to fetch country:", err);
     }

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import DisplayBadges from './DisplayBadge';
+import DisplayFavourites from './DisplayFav';
 import LoginForm from './LoginForm';
 import SignupForm from './SignUpForm';
 import AllCountries from './AllCountries';
@@ -14,6 +15,7 @@ import logoLight from '../assets/logo-light.png';
  
 const Navbar = ({ onFilterChange, theme, onToggleTheme, onShowAll }) => {
   const [showBadges, setShowBadges] = useState(false);
+  const [showfavourites, setShowFavourites] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
   const [showFilter, setShowFilter] = useState(false);
@@ -221,7 +223,7 @@ const Navbar = ({ onFilterChange, theme, onToggleTheme, onShowAll }) => {
  
           {/* Login / Sign Up Button */}
           {user ? (
-            <div className="relative flex items-center md:mr-8">
+            <div className="relative flex items-center md:mr-8 z-50">
               <button
                 onClick={() => setDropdownOpen((prev) => !prev)}
                 className={
@@ -236,7 +238,7 @@ const Navbar = ({ onFilterChange, theme, onToggleTheme, onShowAll }) => {
               </button>
               {dropdownOpen && (
                 <div
-                  className={`absolute right-0 mt-2 w-40 rounded-lg shadow-xl z-50 ${
+                  className={`absolute top-full right-0 mt-2 w-40 rounded-lg shadow-xl z-50 ${
                     theme === "dark"
                       ? "bg-[#0f172a]/90 border border-indigo-700/50"
                       : "bg-white border border-indigo-100"
@@ -255,6 +257,20 @@ const Navbar = ({ onFilterChange, theme, onToggleTheme, onShowAll }) => {
                     }
                   >
                     View Badges
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowFavourites(true);
+                      setDropdownOpen(false);
+                    }}
+                    className={
+                      `block w-full text-left px-4 py-2 transition rounded-t-lg ` +
+                      (theme === "dark"
+                        ? "text-indigo-100 hover:bg-indigo-800/80"
+                        : "text-indigo-900 hover:bg-indigo-50")
+                    }
+                  >
+                    View Favourites
                   </button>
                   <button
                     onClick={() => {
@@ -295,6 +311,8 @@ const Navbar = ({ onFilterChange, theme, onToggleTheme, onShowAll }) => {
  
       {/* Show DisplayBadges Modal */}
       {showBadges && <DisplayBadges onClose={() => setShowBadges(false)} />}
+      {/* Show DisplayFavourites Modal */}
+      {showfavourites && <DisplayFavourites onClose={() => setShowFavourites(false)} />}
  
       {/* Login Modal */}
       {showLogin && (

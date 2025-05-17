@@ -48,10 +48,10 @@ api.interceptors.response.use(
     try {
       // Attempt to refresh token
       const { data } = await axios.get('/api/auth/refresh-token', {
-        baseURL: 'https://nationnavigator.onrender.com' || 'http://localhost:9000',
+        baseURL:'https://nationnavigator.onrender.com'||'http://localhost:9000',
         withCredentials: true
       });
-      
+      //'https://nationnavigator.onrender.com' ||
       localStorage.setItem('accessToken', data.accessToken);
       
       // Retry original request with new token

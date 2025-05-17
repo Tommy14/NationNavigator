@@ -27,7 +27,7 @@ const GlobeVisualization = ({
 
   const backgroundImageUrls = {
     dark: "//unpkg.com/three-globe/example/img/night-sky.png",
-    light: "",
+    light: "//unpkg.com/three-globe/example/img/night-sky.png"
   };
 
   useEffect(() => {
@@ -76,7 +76,16 @@ const GlobeVisualization = ({
   };
 
   return (
-    <div className="flex justify-center items-center h-full w-full overflow-hidden">
+    <div
+      className="flex justify-center items-center h-full w-full overflow-hidden"
+      style={{
+        backgroundImage: 'url("//unpkg.com/three-globe/example/img/night-sky.png")',
+        backgroundSize: '120%',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center',
+        filter: theme === 'light' ? 'invert(1) hue-rotate(165deg)' : 'none'
+      }}
+    >
       {isLoading ? (
         <div className="flex justify-center items-center h-full">
           <div className="text-lg font-medium">Loading globe data...</div>

@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import axios from 'axios';
 import Quiz from './Quiz';
 import { FiX } from 'react-icons/fi';
+import { FaHeart } from 'react-icons/fa';
 
 const CountryDetails = ({ country, onClose }) => {
     const [isQuizOpen, setIsQuizOpen] = useState(false);
     const [showLoginMessage, setShowLoginMessage] = useState(false);
+    const [isFavourite, setIsFavourite] = useState(false);
     if (!country) return null;
 
     const {
@@ -24,6 +27,62 @@ const CountryDetails = ({ country, onClose }) => {
         .map(c => `${c.name} (${c.symbol})`)
         .join(', ')
     : 'N/A';
+
+    useEffect(() => {
+      const checkFavourite = async () => {
+        const token = localStorage.getItem('accessToken');
+        if (!token || !country) return;
+
+        try {
+          const response = await axios.get(
+            `https://nationnavigator.onrender.com/api/users/favourites/${country.cca2}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          if (response.data?.isFavourite) {
+            setIsFavourite(true);
+          }
+        } catch (error) {
+          console.error('Error checking favourite:', error);
+        }
+      };
+
+      checkFavourite();
+    }, [country]);
+
+    const handleToggleFavourite = async () => {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        setShowLoginMessage(true);
+        return;
+      }
+
+      try {
+        if (isFavourite) {
+          await axios.delete(`https://nationnavigator.onrender.com/api/users/favourites/${country.cca2}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setIsFavourite(false);
+        } else {
+          await axios.post(
+            'https://nationnavigator.onrender.com/api/users/favourites',
+            {
+              countryName: name.common,
+              countryCode: country.cca2,
+            },
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+          setIsFavourite(true);
+        }
+      } catch (error) {
+        console.error('Error toggling favourite:', error);
+      }
+    };
 
     if (isQuizOpen) {
         return <Quiz country={country} onClose={() => setIsQuizOpen(false)} />;
@@ -55,7 +114,8 @@ const CountryDetails = ({ country, onClose }) => {
                 <li><strong>Languages:</strong> {languageList}</li>
                 <li><strong>Currencies:</strong> {currencyList}</li>
             </ul>
-            <button
+            <div className="mt-4 flex justify-between items-center">
+              <button
                 onClick={() => {
                   const isLoggedIn = localStorage.getItem('accessToken');
                   if (isLoggedIn) {
@@ -65,10 +125,18 @@ const CountryDetails = ({ country, onClose }) => {
                     setShowLoginMessage(true);
                   }
                 }}
-                className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
-            >
+                className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+              >
                 Start Quiz
-            </button>
+              </button>
+              <button
+                onClick={handleToggleFavourite}
+                className="px-4 py-2 flex items-center gap-2 rounded bg-yellow-500 hover:bg-yellow-600"
+              >
+                {isFavourite ? 'Unfavourite' : 'Favourite'}
+                <FaHeart className={isFavourite ? 'text-red-500 fill-current' : 'text-white'} />
+              </button>
+            </div>
             {showLoginMessage && (
                 <p className="mt-2 text-sm text-red-200">Please login to start the quiz.</p>
             )}
