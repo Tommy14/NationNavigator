@@ -1,4 +1,5 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
+import { MdMusicNote, MdMusicOff } from 'react-icons/md';
 import Navbar from '../components/NavBar';
 import GlobeVisualization from "../components/GlobeVisualization";
 import { fetchCountryDetails } from "../services/countryService";
@@ -41,6 +42,32 @@ export default function Home() {
     }
   }, []);
 
+const [isPlaying, setIsPlaying] = useState(false);
+const audioRef = useRef(null);
+
+useEffect(() => {
+  audioRef.current = new Audio("/audio/background.mp3");
+  audioRef.current.loop = true;
+  audioRef.current.volume = 1;
+  // Do not auto-play here
+
+  return () => {
+    audioRef.current.pause();
+    audioRef.current = null;
+  };
+}, []);
+
+const toggleAudio = () => {
+  if (audioRef.current) {
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
+    }
+    setIsPlaying(!isPlaying);
+  }
+};
+
   return (
     <div
       className={`w-full h-full flex flex-col ${
@@ -73,6 +100,13 @@ export default function Home() {
           />
         </div>
       )}
+      <button
+        onClick={toggleAudio}
+        className="fixed bottom-6 left-6 z-50 p-3 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition"
+        title={isPlaying ? "Pause Music" : "Play Music"}
+      >
+        {isPlaying ? <MdMusicNote size={20} /> : <MdMusicOff size={20} />}
+      </button>
     </div>
   );
 }
